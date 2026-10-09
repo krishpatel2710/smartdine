@@ -1,0 +1,19 @@
+{
+  "name": "smartdine-simple-html-mongodb",
+  "version": "1.0.0",
+  "description": "SmartDine - Simple Full-Stack Restaurant Ordering System using HTML, CSS, JavaScript, Node.js and MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["html", "css", "javascript", "mongodb", "nodejs", "express"],
+  "author": "Krish Patel",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.24.5"
+  }
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartDine – Pure Veg Restaurant Ordering System</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <span class="logo-icon">🌿</span>
+        <div>
+          <span class="logo-title">SmartDine</span>
+          <span class="logo-badge">100% PURE VEG</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Table Selector for QR Dine-in -->
+        <div class="table-selector">
+          <label for="tableSelect">🪑 Table:</label>
+          <select id="tableSelect">
+            <option value="none">Takeaway / Delivery</option>
+            <option value="1">Table 1 (2 Seater)</option>
+            <option value="2">Table 2 (4 Seater)</option>
+            <option value="3" selected>Table 3 (4 Seater) [QR]</option>
+            <option value="4">Table 4 (6 Seater)</option>
+            <option value="5">Table 5 (8 Seater)</option>
+          </select>
+        </div>
+
+        <!-- Orders Button -->
+        <button id="viewOrdersBtn" class="btn btn-outline">
+          📋 My Orders (<span id="ordersCount">0</span>)
+        </button>
+
+        <!-- Cart Button -->
+        <button id="cartBtn" class="btn btn-primary">
+          🛒 Cart (<span id="cartCount">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="tag">🌿 Authentic Sattvic & Modern Fusion</div>
+      <h1>Smart Contactless Dining <br><span class="highlight">Pure Vegetarian Delights</span></h1>
+      <p>Order seamlessly from your table with QR code or delivery. Assisted by our Smart Gemini AI Assistant.</p>
+    </div>
+  </section>
+
+  <!-- Menu Section -->
+  <main class="main-container">
+    <div class="section-header">
+      <h2>Explore Menu</h2>
+      <p>Hand-crafted dishes made with pure butter, malai paneer, and farm-fresh ingredients.</p>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="categoryFilters">
+      <button class="cat-btn active" data-category="All">All</button>
+      <button class="cat-btn" data-category="Pizza">🍕 Pizza</button>
+      <button class="cat-btn" data-category="Burger">🍔 Burger</button>
+      <button class="cat-btn" data-category="Indian">🍛 Indian</button>
+      <button class="cat-btn" data-category="Chinese">🍜 Chinese</button>
+      <button class="cat-btn" data-category="Drinks">🥤 Drinks</button>
+      <button class="cat-btn" data-category="Desserts">🍨 Desserts</button>
+    </div>
+
+    <!-- Foods Grid -->
+    <div class="foods-grid" id="foodsGrid">
+      <div class="loading-state">Loading fresh menu from MongoDB...</div>
+    </div>
+  </main>
+
+  <!-- Floating Draggable Burger AI Assistant Widget -->
+  <div id="aiBurgerWidget" class="ai-burger-widget" title="Drag to move, click to chat with AI!">
+    <div class="burger-badge">AI Assistant</div>
+    <div class="burger-icon">🍔</div>
+  </div>
+
+  <!-- AI Chat Window -->
+  <div id="aiChatWindow" class="ai-chat-window hidden">
+    <div class="chat-header">
+      <div class="chat-title">
+        <span>🤖 SmartDine AI Food Assistant</span>
+      </div>
+      <button id="closeAiChat" class="close-btn">&times;</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai-msg">
+        👋 Namaste! I am your SmartDine Food Assistant. Ask me anything about our Pure Veg menu, budgets, or recommendations!
+      </div>
+    </div>
+    <div class="quick-chips">
+      <button class="chip" data-prompt="Recommend a spicy pizza">🍕 Spicy Pizza</button>
+      <button class="chip" data-prompt="Something under 150 rupees">💰 Under ₹150</button>
+      <button class="chip" data-prompt="Best sweet dessert">🍨 Dessert</button>
+    </div>
+    <form id="aiChatForm" class="chat-input-area">
+      <input type="text" id="aiInput" placeholder="E.g., Suggest something spicy under ₹200..." autocomplete="off">
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cartModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🛒 Your Order Cart</h3>
+        <button id="closeCartBtn" class="close-btn">&times;</button>
+      </div>
+
+      <div id="cartItemsList" class="cart-items-list">
+        <p class="empty-cart-text">Your cart is currently empty. Add dishes from the menu!</p>
+      </div>
+
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">₹0</span>
+        </div>
+        <div class="summary-row">
+          <span>GST (5%)</span>
+          <span id="cartTax">₹0</span>
+        </div>
+        <div class="summary-row total-row">
+          <span>Grand Total</span>
+          <span id="cartGrandTotal">₹0</span>
+        </div>
+      </div>
+
+      <form id="checkoutForm" class="checkout-form">
+        <h4>Customer Details</h4>
+        <div class="form-group">
+          <input type="text" id="custName" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+          <input type="tel" id="custPhone" placeholder="Mobile Number" required>
+        </div>
+        <button type="submit" id="placeOrderBtn" class="btn btn-primary btn-block">
+          Confirm & Place Order in MongoDB 🚀
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Orders Modal -->
+  <div id="ordersModal" class="modal hidden">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>📋 Orders Saved in MongoDB</h3>
+        <button id="closeOrdersBtn" class="close-btn">&times;</button>
+      </div>
+      <div id="ordersListContainer" class="orders-list-container">
+        <p>Loading orders...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2026 SmartDine Restaurant. 100% Pure Vegetarian. Powered by HTML, CSS, JavaScript, Node.js & MongoDB.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
