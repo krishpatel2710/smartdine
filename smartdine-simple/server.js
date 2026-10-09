@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/smartdine";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://krishpatel81852_db_user:Smartdine%40123@cluster0.dkjgkpq.mongodb.net/smartdine?retryWrites=true&w=majority&appName=Cluster0";
 
 // Middleware
 app.use(cors());
