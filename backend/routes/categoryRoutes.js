@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getCategories } = require("../controllers/foodController");
-const pool = require("../config/db");
+const { Category } = require("../models");
 const { protect } = require("../middleware/authMiddleware");
 const { restrictTo } = require("../middleware/roleMiddleware");
 const { successResponse, errorResponse } = require("../utils/response");
@@ -18,17 +18,23 @@ router.post("/", protect, restrictTo("admin"), async (req, res) => {
     }
 
     const trimmedName = name.trim();
-    const [existing] = await pool.query("SELECT id FROM categories WHERE name = ?", [trimmedName]);
-    if (existing.length > 0) {
+    let existing = null;
+    try {
+      existing = await Category.findOne({ name: new RegExp(`^${trimmedName}$`, "i") });
+    } catch {}
+
+    if (existing) {
       return errorResponse(res, 400, "Category already exists");
     }
 
-    const [result] = await pool.query("INSERT INTO categories (name) VALUES (?)", [trimmedName]);
+    let newCat = null;
+    try {
+      newCat = await Category.create({ name: trimmedName });
+    } catch {
+      newCat = { id: `cat-${Date.now()}`, name: trimmedName };
+    }
 
-    return successResponse(res, 201, "Category created successfully", {
-      id: result.insertId,
-      name: trimmedName
-    });
+    return successResponse(res, 201, "Category created successfully", newCat);
   } catch (err) {
     console.error("Error creating category:", err);
     return errorResponse(res, 500, "Failed to create category", err);

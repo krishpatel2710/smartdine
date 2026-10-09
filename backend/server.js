@@ -19,6 +19,11 @@ const aiRoutes = require("./routes/aiRoutes");
 // Import Middleware
 const { notFoundHandler, errorHandler } = require("./middleware/errorMiddleware");
 
+const connectDB = require("./config/db");
+
+// Connect to MongoDB Database
+connectDB();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 

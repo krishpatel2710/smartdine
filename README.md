@@ -1,6 +1,6 @@
 # SmartDine – Smart Restaurant Ordering System with Gemini AI
 
-A full-stack, enterprise-grade restaurant management and ordering platform built with **React.js, Node.js, Express.js, MySQL, and Google Gemini AI**.
+A full-stack, enterprise-grade restaurant management and ordering platform built with **React.js, Node.js, Express.js, MongoDB (Mongoose), and Google Gemini AI**.
 
 SmartDine is specifically designed to stand apart from traditional food delivery platforms by integrating **Google Gemini AI Food Assistant & Recommendations**, **QR-Based Contactless Table Ordering (Dine-In)**, a **Live Kitchen Display System (KDS)**, an **Owner/Admin Operations Dashboard**, a **Real-Time Order Tracking Simulator**, and **Restaurant Performance Analytics**.
 
@@ -9,7 +9,7 @@ SmartDine is specifically designed to stand apart from traditional food delivery
 ## 🌟 Unique System Highlights
 
 1. **🤖 Google Gemini AI Food Assistant**:
-   - **Interactive Chat (`/ai-assistant`) & Floating AI Widget**: Conversational food assistant powered by Google Gemini (`gemini-2.5-flash`) via the official `@google/genai` SDK.
+   - **Interactive Chat (`/ai-assistant`) & Floating AI Widget**: Conversational food assistant powered by Google Gemini via the official `@google/genai` SDK.
    - **Real Menu-Grounded Recommendations**: Backend dynamically injects the live restaurant menu into Gemini's prompt context, ensuring it only suggests actual dishes, accurate prices (₹), and dietary specifications (100% Pure Vegetarian).
    - **Quick Suggestion Prompts**: One-click prompt chips (🍕 *Recommend Pizza*, 🥗 *Vegetarian Food*, 💰 *Under ₹200*, 🔥 *Spicy Food*, ⭐ *Popular Items*).
    - **Direct "Add to Cart" Actions**: Recommended dishes feature direct interactive cart addition buttons.
@@ -53,8 +53,8 @@ SmartDine is specifically designed to stand apart from traditional food delivery
                        │
         ┌──────────────┴──────────────┐
         ▼                             ▼
-   MySQL Database             Google Gemini API
-   (Database: smartdine)      (gemini-2.5-flash via @google/genai)
+    MongoDB Database          Google Gemini API
+    (via Mongoose ODM)        (@google/genai SDK)
 ```
 
 ### Security & AI Architecture

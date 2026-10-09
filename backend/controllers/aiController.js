@@ -1,43 +1,48 @@
 const { GoogleGenAI } = require("@google/genai");
-const db = require("../config/db");
+const { Food } = require("../models");
+
+// Default pure veg fallback menu in case database is offline
+const fallbackMenu = [
+  { id: "1", name: "Margherita Pizza", category: "Pizza", price: 149, rating: 4.9, description: "Classic crust with San Marzano tomato sauce, fresh pure mozzarella, and aromatic basil." },
+  { id: "2", name: "Cheese Burst Pizza", category: "Pizza", price: 199, rating: 4.8, description: "Loaded crust bursting with liquid cheese, golden sweet corn, and herbs." },
+  { id: "3", name: "Farm Fresh Supreme Pizza", category: "Pizza", price: 229, rating: 4.8, description: "Crisp capsicum, red paprika, mushrooms, onions, and black olives with herb drizzle." },
+  { id: "4", name: "Paneer Makhani Pizza", category: "Pizza", price: 249, rating: 4.9, description: "Tender spiced paneer cubes simmered in rich makhani gravy over artisanal hand-stretched crust." },
+  { id: "5", name: "Crispy Veg Burger", category: "Burger", price: 89, rating: 4.6, description: "Golden herb-potato patty, fresh lettuce, sliced tomatoes, and creamy eggless mayonnaise." },
+  { id: "6", name: "Double Cheese Veg Burger", category: "Burger", price: 129, rating: 4.7, description: "Double crispy vegetable cutlet, molten cheddar slice, and tangy in-house relish." },
+  { id: "7", name: "Peri Peri Paneer Burger", category: "Burger", price: 149, rating: 4.8, description: "Char-grilled paneer steak coated in African bird's eye peri peri spice with crunchy slaw." },
+  { id: "8", name: "Dal Makhani", category: "Indian", price: 179, rating: 4.9, description: "Slow-simmered black lentils and kidney beans slow-cooked for 18 hours with white butter and fresh cream." },
+  { id: "9", name: "Paneer Butter Masala", category: "Indian", price: 219, rating: 4.9, description: "Soft malai paneer simmered in velvety cashew nut and tomato butter gravy." },
+  { id: "10", name: "Royal Hyderabadi Veg Biryani", category: "Indian", price: 149, rating: 4.8, description: "Fragrant long-grain basmati rice layered with garden veggies, saffron, and fried onions with raita." },
+  { id: "11", name: "Veg Hakka Noodles", category: "Chinese", price: 139, rating: 4.7, description: "Wok-tossed noodles with shredded cabbage, carrots, bell peppers, and scallions in light soy." },
+  { id: "12", name: "Chilli Paneer Gravy", category: "Chinese", price: 169, rating: 4.8, description: "Fried paneer cubes tossed with capsicum and spring onions in spicy dark soy-chilli gravy." },
+  { id: "13", name: "Mango Lassi", category: "Drinks", price: 69, rating: 4.7, description: "Thick hand-churned yogurt blended with Alphonso mango pulp and fragrant green cardamom." },
+  { id: "14", name: "Cold Coffee with Ice Cream", category: "Drinks", price: 89, rating: 4.8, description: "Chilled espresso brewed with full-cream milk, topped with a scoop of vanilla bean ice cream." },
+  { id: "15", name: "Sizzling Walnut Brownie with Ice Cream", category: "Desserts", price: 129, rating: 4.9, description: "Warm eggless chocolate fudge brownie served on a hot skillet with dark chocolate ganache and vanilla ice cream." }
+];
 
 /**
- * Helper: Fetch all available dishes from MySQL database
+ * Helper: Fetch all available dishes from MongoDB database
  */
 async function getAvailableMenu() {
   try {
-    let rows = [];
-    try {
-      [rows] = await db.query(
-        "SELECT id, name, category, description, price, rating, available, best_seller FROM menu_items WHERE available = 1"
-      );
-    } catch {
-      // Fallback to foods table
+    const docs = await Food.find({ is_available: { $ne: false } }).sort({ category: 1, name: 1 });
+    if (docs && docs.length > 0) {
+      return docs.map((d) => ({
+        id: d._id.toString(),
+        name: d.name,
+        category: d.category,
+        description: d.description || "",
+        price: Number(d.price),
+        rating: Number(d.rating || 4.8),
+        available: d.is_available !== false,
+        best_seller: Boolean(d.best_seller),
+        image: d.image
+      }));
     }
-
-    if (!rows || rows.length === 0) {
-      try {
-        [rows] = await db.query(
-          "SELECT id, name, category, description, price, rating, is_available as available FROM foods WHERE is_available = 1"
-        );
-      } catch {
-        // Continue
-      }
-    }
-
-    if (!rows || rows.length === 0) {
-      try {
-        [rows] = await db.query("SELECT * FROM foods WHERE 1=1");
-      } catch {
-        // Continue
-      }
-    }
-
-    return rows && rows.length > 0 ? rows : [];
   } catch (err) {
-    console.warn("[AI Controller] Error fetching menu from database:", err.message);
-    return [];
+    console.warn("[AI Controller] MongoDB read fallback:", err.message);
   }
+  return fallbackMenu;
 }
 
 /**
@@ -75,7 +80,6 @@ function generateSmartFallbackReply(message, menu) {
   });
 
   if (candidates.length === 0) {
-    // If budget was too strict, get closest affordable
     candidates = menu.filter((item) => !maxBudget || Number(item.price) <= maxBudget);
   }
 
@@ -170,9 +174,9 @@ RULES:
 Available Restaurant Menu:
 ${menuContext}`;
 
-        // Call Gemini API using modern high-performance flash-lite model
+        // Call Gemini API using current gemini-3.8-flash model
         const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash-lite",
+          model: "gemini-3.8-flash",
           contents: [{ role: "user", parts: [{ text: message }] }],
           config: {
             systemInstruction: systemInstruction,

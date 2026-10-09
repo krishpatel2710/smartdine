@@ -3,8 +3,8 @@
 SmartDine is built as a complete full-stack web application:
 - **Frontend**: React 19 + Vite (built to `dist/`)
 - **Backend**: Node.js + Express (serving REST APIs + static React build)
-- **AI**: Google Gemini API integration (`gemini-3.5-flash-lite`)
-- **Database**: MySQL with automatic resilient in-memory fallback
+- **AI**: Google Gemini API integration via `@google/genai`
+- **Database**: MongoDB (Mongoose) with automatic resilient in-memory fallback
 
 ---
 
@@ -13,9 +13,9 @@ SmartDine is built as a complete full-stack web application:
 Render allows you to host both the React frontend and Node.js backend together as a single Web Service on a free public `https://*.onrender.com` URL.
 
 ### Step-by-Step:
-1. Push your code to a **GitHub** repository.
-2. Sign in to [Render.com](https://render.com) and click **New + > Web Service**.
-3. Select your GitHub repository.
+1. Push your code to your **GitHub** repository (`krishpatel2710/smartdine`).
+2. Sign in to [Render.com](https://render.com) with GitHub and click **New + > Web Service**.
+3. Select your GitHub repository (`smartdine`).
 4. Fill in the service details:
    - **Name**: `smartdine`
    - **Language**: `Node`
@@ -31,10 +31,11 @@ Render allows you to host both the React frontend and Node.js backend together a
 5. In **Environment Variables**, add:
    - `NODE_ENV` = `production`
    - `PORT` = `10000`
-   - `GEMINI_API_KEY` = `AIzaSyDBpPCoSIfO9ZYy2__XJtGHYfQ8eH3Nk70`
+   - `GEMINI_API_KEY` = `YOUR_GEMINI_API_KEY`
    - `JWT_SECRET` = `smartdine_production_secret_key_2026`
+   - `MONGODB_URI` = `mongodb+srv://...` (or leave unset to use resilient in-memory mode)
 6. Click **Deploy Web Service**!
-   Render will build the Vite app, start the Express server, and give you a free live HTTPS URL (e.g. `https://smartdine.onrender.com`).
+   Render will build the Vite app, start the Express server, and provide your live HTTPS URL (e.g. `https://smartdine.onrender.com`).
 
 *(Note: The pre-configured [render.yaml](./render.yaml) is already included in your project root.)*
 
@@ -57,14 +58,11 @@ If you prefer hosting the React frontend on Vercel:
 
 ## 📱 Option 3: Instant Live Access on Your Local Wi-Fi (Phone, Tablet, PC)
 
-Your production server is already running and accessible to any smartphone or device connected to your Wi-Fi network!
+Your production server can run locally and be accessed by any smartphone or device connected to your Wi-Fi network:
 
-1. Find your computer's local IP address (`10.15.118.65`).
-2. Make sure port 5000 is open in Windows Firewall.
-3. Open any browser on your phone or tablet and visit:
-   ```
-   http://10.15.118.65:5000
-   ```
+1. Find your computer's local IP address.
+2. Ensure port 5000 is accessible.
+3. Open any browser on your phone or tablet and visit `http://<YOUR_LOCAL_IP>:5000`.
 4. You can scan table QR codes, chat with the movable Burger AI assistant, and test checkout live from your phone!
 
 ---
@@ -80,7 +78,7 @@ docker build -t smartdine:latest .
 
 # 2. Run the container
 docker run -d -p 5000:5000 \
-  -e GEMINI_API_KEY="AIzaSyDBpPCoSIfO9ZYy2__XJtGHYfQ8eH3Nk70" \
+  -e GEMINI_API_KEY="YOUR_GEMINI_API_KEY" \
   -e NODE_ENV="production" \
   --name smartdine-app smartdine:latest
 ```
@@ -94,9 +92,6 @@ Then visit `http://localhost:5000`.
 |---|---|---|
 | `NODE_ENV` | Environment mode | `production` |
 | `PORT` | Server listening port | `5000` (or `10000` on Render) |
-| `GEMINI_API_KEY` | Google Gemini API key | `AIzaSyDBpPCoSIfO9ZYy2__XJtGHYfQ8eH3Nk70` |
+| `GEMINI_API_KEY` | Google Gemini API key | Get from Google AI Studio |
 | `JWT_SECRET` | Secret token encryption key | Any strong random string |
-| `DB_HOST` | MySQL database host (optional) | `localhost` or cloud DB host |
-| `DB_USER` | MySQL database username | `root` |
-| `DB_PASSWORD` | MySQL password | (empty or cloud DB password) |
-| `DB_NAME` | MySQL database name | `smartdine` |
+| `MONGODB_URI` | MongoDB Connection URI | `mongodb://127.0.0.1:27017/smartdine` or MongoDB Atlas URI |
